@@ -89,13 +89,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .recv_line_utf8()
             .build();
 
-        let flag = match pipe.payload(payload).await {
-            Ok(value) => value,
-            Err(PipeError::ConditionFailed) => continue,
-            Err(e) => return Err(e.into()),
-        };
-
+        let flag = pipe.payload(payload).await?;
         println!("Flag: {flag}");
+        
         break;
     }
 
